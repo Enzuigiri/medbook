@@ -1,8 +1,8 @@
-import { User } from "../src/domain/entities/user";
-import { GetAllUsersUseCase } from "../src/domain/interfaces/use-cases/user/get-all-users";
-import { CreateUserUseCase } from "../src/domain/interfaces/use-cases/user/create-user";
-import UserRouter from "../src/presentation/routers/user-router"
-import server from "../src/server";
+import { User } from "../../../src/domain/entities/user";
+import { GetAllUsersUseCase } from "../../../src/domain/interfaces/use-cases/user/get-all-users";
+import { CreateUserUseCase } from "../../../src/domain/interfaces/use-cases/user/create-user";
+import UserRouter from "../../../src/presentation/routers/user-router"
+import server from "../../../src/server";
 import request from "supertest";
 
 class MockGetAllUsersUseCase implements GetAllUsersUseCase {
@@ -25,11 +25,9 @@ describe("User Router", () => {
         mockGetAllUsersUseCase = new MockGetAllUsersUseCase()
         mockCreatedUserUseCase = new MockCreatedUserUseCase()
         server.use("/user", UserRouter(mockCreatedUserUseCase, mockGetAllUsersUseCase))
-    })
-
-    beforeEach(() => {
         jest.clearAllMocks
     })
+
 
     describe("GET /user", () => {
         test("should return 200 with data", async () => {
@@ -52,7 +50,7 @@ describe("User Router", () => {
     })
 
     describe("POST /user", () => {
-        const InputData = [{id: "1", name: "John Doe", email: "johndoe@gmail.com", password: "asdasd"}]
+        const InputData = {id: "1", name: "John Doe", email: "johndoe@gmail.com", password: "asdasd"}
 
         test("should return with response 201", async () => {
             jest.spyOn(mockCreatedUserUseCase, "execute").mockImplementation(() => Promise.resolve(true))
