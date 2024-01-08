@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "jest --watchAll --collectCoverage"
+    "test": "jest --watchAll"
   },
   "keywords": [],
   "author": "",

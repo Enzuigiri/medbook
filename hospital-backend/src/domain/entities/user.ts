@@ -4,6 +4,6 @@ export interface User {
   id?: string;
   name: string;
   email: string;
-  password: string;
+  password?: string;
   medical_record?: MedicalRecord;
 }
