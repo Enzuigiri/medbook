@@ -1,3 +1,5 @@
+import { Encryption } from "./encryption";
+
 export type Attachment = string;
 
 export interface Storage {
@@ -17,9 +19,11 @@ export interface Storage {
 }
 
 export class AwsStorage implements Storage {
+  private readonly encryption: Encryption;
   private readonly s3: { key: string; access_key: string };
 
-  public constructor(key: string, access_key: string) {
+  public constructor(encryption: Encryption ,key: string, access_key: string) {
+    this.encryption = encryption;
     this.s3.key = key;
     this.s3.access_key = access_key;
   }

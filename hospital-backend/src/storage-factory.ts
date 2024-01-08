@@ -1,3 +1,4 @@
+import { Encryption } from "./encryption";
 import { AwsStorage, SftpStorage, Storage, WebDavStorage } from "./storage";
 export enum Destination {
   AWS,
@@ -18,8 +19,14 @@ export var storage_config = {
   },
 };
 
-export class storage_factory {
-  static create_factory(company_id: string): Storage {
+export class StorageFactory {
+  private readonly encryption: Encryption;
+
+  constructor(encryption: Encryption) {
+    this.encryption = encryption;
+  }
+
+  create_factory(company_id: string): Storage {
     if (storage_config.sftp_companies[company_id]) {
       const config = storage_config.sftp_companies[company_id];
       return new SftpStorage(config.port, config.access_key);
@@ -27,7 +34,11 @@ export class storage_factory {
       const config = storage_config.webdav_companies[company_id];
       return new WebDavStorage(config.URI, config.access_key);
     } else {
-      return new AwsStorage(storage_config.awsKey, storage_config.awsAccessKey);
+      return new AwsStorage(
+        this.encryption,
+        storage_config.awsKey,
+        storage_config.awsAccessKey
+      );
     }
   }
 }

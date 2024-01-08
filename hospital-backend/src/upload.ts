@@ -1,3 +1,4 @@
+import { AesEncrypt } from "./encryption";
 import { ImageScaler, SharpImageScaler } from "./image-scaler";
 import {
   DocumentPreviewGenerator,
@@ -6,7 +7,7 @@ import {
 } from "./preview-generator";
 import { PreviewGeneratorFactory } from "./preview-generator-factory";
 import { Attachment, Storage } from "./storage";
-import { storage_config, storage_factory } from "./storage-factory";
+import { StorageFactory } from "./storage-factory";
 import {
   ThreatProtecScanner,
   SynergySecurityScanner,
@@ -70,7 +71,10 @@ class UploadRequest {
   }
 }
 
-const storage = storage_factory.create_factory();
+const keystore = "asdadsasdads"; // new KeyService('https://keys.example.com')
+const encryption = new AesEncrypt(keystore);
+const storage_factory = new StorageFactory(encryption);
+const storage = storage_factory.create_factory("asdad")
 const request = new UploadRequest(
   preview_factory,
   storage,
