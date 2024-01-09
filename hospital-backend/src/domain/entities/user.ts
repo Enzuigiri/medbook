@@ -7,7 +7,7 @@ export interface User {
   email: string;
   password?: string;
   medical_record?: MedicalRecord;
-  hospital_request?: [HospitalRequest]
+  hospital_request?: HospitalRequest[];
   created_at?: Date;
   last_login?: Date;
 }
