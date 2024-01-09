@@ -23,13 +23,13 @@ async function getMongoDS() {
 
 (async () => {
     const dataSource = await getMongoDS();
-
+    const version = "api/v1"
     const contactMiddleWare = UserRouter(
         new CreateUser(new UserRepositoryImpl(dataSource)),
         new GetAllUsers(new UserRepositoryImpl(dataSource))
     )
 
-    server.use("/user", contactMiddleWare)
+    server.use(`/${version}/user`, contactMiddleWare)
     server.listen(3000, () => console.log("Running on http://localhost:3000"))
 
 })()

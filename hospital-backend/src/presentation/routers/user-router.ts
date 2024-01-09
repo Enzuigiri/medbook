@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { GetAllUsersUseCase } from "../../domain/interfaces/use-cases/user/get-all-users.js";
 import { CreateUserUseCase } from "../../domain/interfaces/use-cases/user/create-user.js";
+import { ErrorUtils, RequestError } from "../../utils/error/error-utils.js";
 
 export default function UserRouter(
   createUserUseCase: CreateUserUseCase,
@@ -26,16 +27,20 @@ export default function UserRouter(
     body("name").isString().notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
-        const result = validationResult(req);
-        
-        if (result.isEmpty()) {
+        const exception = validationResult(req);
+
+        if (exception.isEmpty()) {
           await createUserUseCase.execute(req.body);
           res.status(201).send({ message: "Created" });
         }
-        
-        return res.status(400).send({ message: "Some data is missing"});
+
+        ErrorUtils.error.badRequestException({message: "Some data is missing or wrong value"})
       } catch (err) {
-        res.status(500).send({ message: "Error fetching data " });
+        if (err instanceof RequestError) {
+          res.status(err.getErrorCode()).send({ message: err.message })
+        } else {
+          res.status(500).send({ message: "Error fetching data" });
+        }
       }
     }
   );
