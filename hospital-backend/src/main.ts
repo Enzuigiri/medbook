@@ -6,7 +6,8 @@ import { UserRepositoryImpl } from "./domain/repositories/user-repository";
 import { MonngoDBUserDataSource } from "./data/data-sources/mongodb/mongodb-user-data-source";
 import { CreateUser } from "./domain/use-cases/user/create-user";
 import server from "./server";
-
+import AuthRouter from "./presentation/routers/auth-router";
+import { LoginAuth } from "./domain/use-cases/auth/login-auth";
 
 async function getMongoDS() {
   const client: MongoClient = new MongoClient(
@@ -25,15 +26,19 @@ async function getMongoDS() {
 }
 
 (async () => {
-    const dataSource = await getMongoDS();
-    const version = "api/v1"
-    const contactMiddleWare = UserRouter(
-        new CreateUser(new UserRepositoryImpl(dataSource)),
-        new GetAllUsers(new UserRepositoryImpl(dataSource))
-    )
+  const dataSource = await getMongoDS();
+  const version = "api/v1";
 
-    server.use(`/${version}/user`, contactMiddleWare)
-    server.listen(3000, () => console.log("Running on http://localhost:3000"))
+  const userMiddleWare = UserRouter(
+    new CreateUser(new UserRepositoryImpl(dataSource)),
+    new GetAllUsers(new UserRepositoryImpl(dataSource))
+  );
 
-})()
+  const authMiddleWare = AuthRouter(
+    new LoginAuth(new UserRepositoryImpl(dataSource))
+  );
 
+  server.use(`/${version}/user`, userMiddleWare);
+  server.use(`/${version}/auth`, authMiddleWare);
+  server.listen(3000, () => console.log("Running on http://localhost:3000"));
+})();

@@ -10,15 +10,14 @@ export default function UserRouter(
 ) {
   const router = express.Router();
 
-  router.get( "/", async (req: Request, res: Response) => {
-      try {
-        const users = await getAllUsersUseCase.execute();
-        res.send(users);
-      } catch (err) {
-        res.status(500).send({ message: "Error fetching data" });
-      }
+  router.get("/", async (req: Request, res: Response) => {
+    try {
+      const users = await getAllUsersUseCase.execute();
+      res.send(users);
+    } catch (err) {
+      res.status(500).send({ message: "Error fetching data" });
     }
-  );
+  });
 
   router.post(
     "/",
@@ -31,15 +30,17 @@ export default function UserRouter(
 
         if (exception.isEmpty()) {
           await createUserUseCase.execute(req.body);
-          res.status(201).send({ message: "Created" });
+          return res.status(201).send({ message: "Created" });
         }
 
-        ErrorUtils.error.badRequestException({message: "Some data is missing or wrong value"})
+        ErrorUtils.error.badRequestException({
+          message: "Some data is missing or wrong value",
+        });
       } catch (err) {
         if (err instanceof RequestError) {
-          res.status(err.getErrorCode()).send({ message: err.message })
+          res.status(err.getErrorCode()).send({ message: err.message });
         } else {
-          res.status(500).send({ message: "Error fetching data" });
+          res.status(500).send({ message: "Error fetching data or email alredy exist" });
         }
       }
     }
