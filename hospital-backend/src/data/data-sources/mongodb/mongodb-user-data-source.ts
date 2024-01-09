@@ -11,7 +11,7 @@ export class MonngoDBUserDataSource implements UserDataSource {
     }
 
     async createUser(user: User): Promise<boolean> {
-        const result = await this.database.inserOne(user)
+        const result = await this.database.insertOne(user)
         return result !== null
     }
 

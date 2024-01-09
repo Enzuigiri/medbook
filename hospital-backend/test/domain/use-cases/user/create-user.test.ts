@@ -1,5 +1,5 @@
-import { User } from "../../../src/domain/entities/user";
-import { UserRepository } from "../../../src/domain/interfaces/repositories/user-repository";
+import { User } from "../../../../src/domain/entities/user";
+import { UserRepository } from "../../../../src/domain/interfaces/repositories/user-repository";
 
 describe("Create user usecase", () => {
     class MockUserRepository implements UserRepository {

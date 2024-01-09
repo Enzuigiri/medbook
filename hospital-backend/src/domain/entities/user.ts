@@ -7,3 +7,4 @@ export interface User {
   password?: string;
   medical_record?: MedicalRecord;
 }
+
