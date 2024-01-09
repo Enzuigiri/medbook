@@ -9,6 +9,11 @@ export class MonngoDBUserDataSource implements UserDataSource {
     constructor(database: MongoDBWrapper) {
         this.database = database
     }
+    
+    async getUserByEmail(email: string): Promise<User> {
+        const result = await this.database.findOne({email: email})
+        return result
+    }
 
     async createUser(user: User): Promise<boolean> {
         const result = await this.database.insertOne(user)

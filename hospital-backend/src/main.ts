@@ -9,16 +9,19 @@ import server from "./server";
 
 
 async function getMongoDS() {
-    const client: MongoClient = new MongoClient("mongodb://root:Test12345!@localhost:27017/")
-    await client.connect()
-    const db = client.db("account_db");
+  const client: MongoClient = new MongoClient(
+    "mongodb://root:Test12345!@localhost:27017/"
+  );
+  await client.connect();
+  const db = client.db("account_db");
 
-    const contactDatabase: MongoDBWrapper = {
-        find: (query) => db.collection("users").find(query).toArray(),
-        insertOne: (doc: any) => db.collection("users").insertOne(doc)
-    }
+  const contactDatabase: MongoDBWrapper = {
+    find: (query) => db.collection("users").find(query).toArray(),
+    insertOne: (doc: any) => db.collection("users").insertOne(doc),
+    findOne: (query) => db.collection("users").findOne(query),
+  };
 
-    return new MonngoDBUserDataSource(contactDatabase);
+  return new MonngoDBUserDataSource(contactDatabase);
 }
 
 (async () => {

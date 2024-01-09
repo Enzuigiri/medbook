@@ -7,6 +7,12 @@ export class UserRepositoryImpl implements UserRepository {
   constructor(userDataSouce: UserDataSource) {
     this.userDataSource = userDataSouce;
   }
+
+  async getUserByEmail(email: string): Promise<User> {
+    const result = await this.userDataSource.getUserByEmail(email);
+    return result;
+  }
+
   async createUser(user: User): Promise<Boolean> {
     const result = await this.userDataSource.createUser(user);
     return result;
