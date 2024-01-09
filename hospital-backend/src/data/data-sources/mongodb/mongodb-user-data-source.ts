@@ -9,6 +9,12 @@ export class MonngoDBUserDataSource implements UserDataSource {
     constructor(database: MongoDBWrapper) {
         this.database = database
     }
+
+    async update(user: User): Promise<any> {
+       const result = await this.database.update({email: user.email}, user)
+       return result !== null
+    }
+    
     
     async getUserByEmail(email: string): Promise<User> {
         const result = await this.database.findOne({email: email})
@@ -19,6 +25,7 @@ export class MonngoDBUserDataSource implements UserDataSource {
         const result = await this.database.insertOne(user)
         return result !== null
     }
+
 
     async getAll(): Promise<User[]> {
         const result = await this.database.find({})

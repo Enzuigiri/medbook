@@ -10,4 +10,5 @@ export interface User {
   hospital_request?: HospitalRequest[];
   created_at?: Date;
   last_login?: Date;
+  refrest_token?: string;
 }
