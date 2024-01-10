@@ -14,7 +14,8 @@ export default function verifyUserToken(
     const token = authHeader && authHeader.split(" ")[1];
     if (token == null) return res.sendStatus(401);
     const jwt = new JwtService();
-    jwt.checkToken(token, ENV.TOKEN_SECRET);
+    const result = jwt.checkToken(token, ENV.TOKEN_SECRET);
+    req.body = result
     next();
   } catch (err) {
     if (err instanceof RequestError) {

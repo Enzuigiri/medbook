@@ -15,6 +15,7 @@ export default function UserRouter(
   verifyUserToken,
   async (req: Request, res: Response) => {
     try {
+      console.log(req.body)
       const users = await getAllUsersUseCase.execute();
       res.send(users);
     } catch (err) {

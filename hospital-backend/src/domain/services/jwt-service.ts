@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 
 export class JwtService implements IJwtService {
   checkToken(token: string, secrets: string): any {
-    jwt.verify(token, secrets, (err: any, user: any) => {
+    let result = jwt.verify(token, secrets, (err: any, user: any) => {
       if (err) {
         ErrorUtils.error.unauthorizedException({
           message: "Token is expired or didn't set or wrong",
@@ -15,6 +15,7 @@ export class JwtService implements IJwtService {
       }
       return user;
     });
+    return result
   }
 
   createToken(
