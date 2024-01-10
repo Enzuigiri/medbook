@@ -10,7 +10,6 @@ import AuthRouter from "./presentation/routers/auth-router";
 import { LoginAuth } from "./domain/use-cases/auth/login-auth";
 import { BcryptService } from "./domain/services/bcrypt-service";
 import { JwtService } from "./domain/services/jwt-service";
-import { AuthenticateTokenMiddleware } from "./presentation/middleware/token-verify";
 
 async function getMongoDS() {
   const client: MongoClient = new MongoClient(
@@ -34,13 +33,11 @@ async function getMongoDS() {
   const dataSource = await getMongoDS();
   const bcryptService = new BcryptService();
   var jwtService = new JwtService();
-  const authenticateToken = new AuthenticateTokenMiddleware(jwtService);
   const version = "api/v1";
 
   const userMiddleWare = UserRouter(
     new CreateUser(new UserRepositoryImpl(dataSource), bcryptService),
-    new GetAllUsers(new UserRepositoryImpl(dataSource)),
-    authenticateToken
+    new GetAllUsers(new UserRepositoryImpl(dataSource))
   );
 
   const authMiddleWare = AuthRouter(

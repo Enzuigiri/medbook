@@ -3,18 +3,16 @@ import { body, validationResult } from "express-validator";
 import { GetAllUsersUseCase } from "../../domain/interfaces/use-cases/user/get-all-users.js";
 import { CreateUserUseCase } from "../../domain/interfaces/use-cases/user/create-user.js";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils.js";
-import { AuthenticateTokenMiddleware } from "../middleware/token-verify.js";
-import { JwtService } from "../../domain/services/jwt-service.js";
+import verifyUserToken from "../middleware/token-verify.js";
 
 export default function UserRouter(
   createUserUseCase: CreateUserUseCase,
-  getAllUsersUseCase: GetAllUsersUseCase,
-  authenticateToken: AuthenticateTokenMiddleware
+  getAllUsersUseCase: GetAllUsersUseCase
 ) {
   const router = express.Router();
 
   router.get("/", 
-  authenticateToken.userToken,
+  verifyUserToken,
   async (req: Request, res: Response) => {
     try {
       const users = await getAllUsersUseCase.execute();
