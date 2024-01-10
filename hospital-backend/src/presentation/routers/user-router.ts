@@ -1,7 +1,9 @@
 import express, { Request, Response } from "express";
-import validator from 'validator';
+import { body, validationResult } from "express-validator";
 import { GetAllUsersUseCase } from "../../domain/interfaces/use-cases/user/get-all-users.js";
 import { CreateUserUseCase } from "../../domain/interfaces/use-cases/user/create-user.js";
+import { ErrorUtils, RequestError } from "../../utils/error/error-utils.js";
+import verifyUserToken from "../middleware/token-verify.js";
 
 export default function UserRouter(
   createUserUseCase: CreateUserUseCase,
@@ -9,8 +11,11 @@ export default function UserRouter(
 ) {
   const router = express.Router();
 
-  router.get("/", async (req: Request, res: Response) => {
+  router.get("/", 
+  verifyUserToken,
+  async (req: Request, res: Response) => {
     try {
+      console.log(req.body)
       const users = await getAllUsersUseCase.execute();
       res.send(users);
     } catch (err) {
@@ -18,15 +23,31 @@ export default function UserRouter(
     }
   });
 
-  router.post("/", async (req: Request, res: Response) => {
-    try {
-      let body = req.body
-      await createUserUseCase.execute(req.body);
-      res.status(201).send({ message: "Created" });
-    } catch (err) {
-      res.status(500).send({ message: "Error fetching data " });
+  router.post(
+    "/",
+    body("email").isEmail().notEmpty().escape(),
+    body("password").isString().notEmpty().escape(),
+    body("name").isString().notEmpty().escape(),
+    async (req: Request, res: Response) => {
+      try {
+        const exception = validationResult(req);
+
+        if (exception.isEmpty()) {
+          await createUserUseCase.execute(req.body);
+          return res.status(201).send({ message: "Created" });
+        }
+
+        ErrorUtils.error.badRequestException({
+          message: "Some data is missing or wrong value",
+        });
+      } catch (err) {
+        if (err instanceof RequestError) {
+          return res.status(err.getErrorCode()).send({ message: err.message });
+        }
+        res.status(500).send({ message: "Error fetching data or email alredy exist" });
+      }
     }
-  });
+  );
 
   return router;
 }

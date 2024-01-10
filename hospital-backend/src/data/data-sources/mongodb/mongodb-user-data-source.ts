@@ -10,10 +10,22 @@ export class MonngoDBUserDataSource implements UserDataSource {
         this.database = database
     }
 
+    async update(user: User): Promise<any> {
+       const result = await this.database.update({email: user.email}, user)
+       return result !== null
+    }
+    
+    
+    async getUserByEmail(email: string): Promise<User> {
+        const result = await this.database.findOne({email: email})
+        return result
+    }
+
     async createUser(user: User): Promise<boolean> {
         const result = await this.database.insertOne(user)
         return result !== null
     }
+
 
     async getAll(): Promise<User[]> {
         const result = await this.database.find({})

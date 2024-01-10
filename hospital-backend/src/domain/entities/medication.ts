@@ -1,7 +1,7 @@
 export interface Medication {
   id?: string;
   hospital?: string;
-  name: string;
+  staff_name: string;
   dose: string;
   frequency: string;
 }
