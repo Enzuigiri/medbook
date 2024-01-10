@@ -1,3 +1,4 @@
+import { ENV } from "../../../env";
 import { ErrorUtils } from "../../../utils/error/error-utils";
 import { RequestAuth, ResponseAuth } from "../../entities/auth";
 import { UserRepository } from "../../interfaces/repositories/user-repository";
@@ -36,11 +37,15 @@ export class LoginAuth implements LoginUseCase {
       let tokenPayload: IJwtServicePayload = { email: result.email };
       let refresh_token = this.jwtService.createToken(
         tokenPayload,
-        "asdads",
-        "1800s"
+        ENV.TOKEN_SECRET,
+        ENV.TOKEN_TTL + "s"
       );
-      let token = this.jwtService.createToken(tokenPayload, "asdada", "1800s");
-        
+      let token = this.jwtService.createToken(
+        tokenPayload,
+        ENV.TOKEN_SECRET,
+        ENV.TOKEN_TTL + "s"
+      );
+
       result.last_login = new Date();
       result.refrest_token = refresh_token;
       await this.userRepository.update(result);

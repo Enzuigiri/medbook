@@ -6,11 +6,11 @@ import {
 import jwt from "jsonwebtoken";
 
 export class JwtService implements IJwtService {
-  async checkToken(token: string, secrets: string): Promise<any> {
+  checkToken(token: string, secrets: string): any {
     jwt.verify(token, secrets, (err: any, user: any) => {
       if (err) {
         ErrorUtils.error.unauthorizedException({
-          message: "Token is expired didn't set",
+          message: "Token is expired or didn't set or wrong",
         });
       }
       return user;

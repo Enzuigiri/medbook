@@ -3,14 +3,19 @@ import { body, validationResult } from "express-validator";
 import { GetAllUsersUseCase } from "../../domain/interfaces/use-cases/user/get-all-users.js";
 import { CreateUserUseCase } from "../../domain/interfaces/use-cases/user/create-user.js";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils.js";
+import { AuthenticateTokenMiddleware } from "../middleware/token-verify.js";
+import { JwtService } from "../../domain/services/jwt-service.js";
 
 export default function UserRouter(
   createUserUseCase: CreateUserUseCase,
-  getAllUsersUseCase: GetAllUsersUseCase
+  getAllUsersUseCase: GetAllUsersUseCase,
+  authenticateToken: AuthenticateTokenMiddleware
 ) {
   const router = express.Router();
 
-  router.get("/", async (req: Request, res: Response) => {
+  router.get("/", 
+  authenticateToken.userToken,
+  async (req: Request, res: Response) => {
     try {
       const users = await getAllUsersUseCase.execute();
       res.send(users);
@@ -38,10 +43,9 @@ export default function UserRouter(
         });
       } catch (err) {
         if (err instanceof RequestError) {
-          res.status(err.getErrorCode()).send({ message: err.message });
-        } else {
-          res.status(500).send({ message: "Error fetching data or email alredy exist" });
+          return res.status(err.getErrorCode()).send({ message: err.message });
         }
+        res.status(500).send({ message: "Error fetching data or email alredy exist" });
       }
     }
   );
