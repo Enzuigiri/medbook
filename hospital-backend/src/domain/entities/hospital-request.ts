@@ -1,6 +1,6 @@
 export interface HospitalRequest {
   user_id: string;
-  req_id?: string;
+  id?: string;
   hospital_name: string;
   hospital_id: string;
   staff_name: string;
@@ -11,6 +11,7 @@ export interface HospitalRequest {
 }
 
 export interface HospitalRequestResponse {
+  user_id: string;
   req_id: string;
   request_status: RequestStatus;
 }

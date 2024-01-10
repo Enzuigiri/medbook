@@ -5,12 +5,17 @@ import {
 } from "../middleware/token-verify";
 import { body, validationResult } from "express-validator";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils";
-import { GetAllRequestUseCase } from "../../domain/interfaces/use-cases/hospital/get_all_requests";
-import { CreateHospitalAccessRequestUseCase } from "../../domain/interfaces/use-cases/hospital/create_access_request";
+import { GetAllRequestUseCase } from "../../domain/interfaces/use-cases/hospital/get-all-requests";
+import { CreateHospitalAccessRequestUseCase } from "../../domain/interfaces/use-cases/hospital/create-access-request";
+import { HospitalAccessResponse } from "../../domain/use-cases/hospital/response-access-request";
+import { HospitalAccessResponseUseCase } from "../../domain/interfaces/use-cases/hospital/response-access-request";
+import { JwtService } from "../../domain/services/jwt-service";
+import { ENV } from "../../env";
 
 export default function HospitalRequestRouter(
-  create_access_request: CreateHospitalAccessRequestUseCase,
-  get_all_request: GetAllRequestUseCase
+  createAccessRequest: CreateHospitalAccessRequestUseCase,
+  getAllRequest: GetAllRequestUseCase,
+  responseAccessRequest: HospitalAccessResponseUseCase
 ) {
   const router = express.Router();
 
@@ -23,8 +28,8 @@ export default function HospitalRequestRouter(
       try {
         const exception = validationResult(req);
         if (exception.isEmpty()) {
-          const users = await create_access_request.execute(req.body);
-          return res.send(users);
+          await createAccessRequest.execute(req.body);
+          return res.status(201).send({ message: "Request created" });
         }
         ErrorUtils.error.badRequestException({
           message: "Token is hijacked",
@@ -41,14 +46,46 @@ export default function HospitalRequestRouter(
   router.get(
     "/",
     verifyUserToken,
-    body("email").notEmpty().escape(),
+    body("user_id").notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
         const exception = validationResult(req);
         if (exception.isEmpty()) {
-          const request = await get_all_request.execute(req.body.email);
+          const request = await getAllRequest.execute(req.body.user_id);
           return res.send(request);
         }
+      } catch (err) {
+        if (err instanceof RequestError) {
+          return res.status(err.getErrorCode()).send({ message: err.message });
+        }
+        res.status(500).send({ message: "Error fetching data" });
+      }
+    }
+  );
+
+  router.put(
+    "/response",
+    verifyUserToken,
+    body("user_id").notEmpty().escape(),
+    body("req_id").notEmpty().escape(),
+    body("request_status").notEmpty().escape(),
+    async (req: Request, res: Response) => {
+      try {
+        const exception = validationResult(req);
+        if (exception.isEmpty()) {
+          const result = await responseAccessRequest.execute(req.body);
+          var token = "Failed to create";
+          if (result) {
+            token = new JwtService().createToken({
+              user_id: req.body.user_id,
+              req_id: req.body.req_id,
+            }, ENV.WRITE_TOKEN_SECRET, "");
+          }
+          return res.status(result ? 200 : 400).send({ token: token});
+        }
+        ErrorUtils.error.badRequestException({
+          message: "Some data is missing or wrong value",
+        });
       } catch (err) {
         if (err instanceof RequestError) {
           return res.status(err.getErrorCode()).send({ message: err.message });

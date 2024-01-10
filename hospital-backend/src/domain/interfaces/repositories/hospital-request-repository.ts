@@ -4,9 +4,7 @@ import {
 } from "../../entities/hospital-request";
 
 export interface HospitalRequestRepository {
-  create(hospital_request: HospitalRequest): Promise<boolean>;
+  create(request: HospitalRequest): Promise<boolean>;
   getRequests(user_id: string): Promise<HospitalRequest[]>;
-  updateResponseStatus(
-    hospital_response: HospitalRequestResponse
-  ): Promise<boolean>;
+  updateResponseStatus(response: HospitalRequestResponse): Promise<boolean>;
 }

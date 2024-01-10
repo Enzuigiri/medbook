@@ -15,7 +15,7 @@ export function verifyUserToken(
     if (token == null) return res.sendStatus(401);
     const jwt = new JwtService();
     const result = jwt.checkToken(token, ENV.TOKEN_SECRET);
-    req.body = result;
+    req.body.user_id = result.email;
     next();
   } catch (err) {
     if (err instanceof RequestError) {

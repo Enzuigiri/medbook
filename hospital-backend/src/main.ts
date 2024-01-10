@@ -1,4 +1,4 @@
-import { Db, MongoClient } from "mongodb";
+import { MongoClient } from "mongodb";
 import { MongoDBWrapper } from "./data/interfaces/mongo-db-wrapper";
 import UserRouter from "./presentation/routers/user-router";
 import { GetAllUsers } from "./domain/use-cases/user/get-all-users";
@@ -11,10 +11,11 @@ import { LoginAuth } from "./domain/use-cases/auth/login-auth";
 import { BcryptService } from "./domain/services/bcrypt-service";
 import { JwtService } from "./domain/services/jwt-service";
 import HospitalRequestRouter from "./presentation/routers/hospital-router";
-import { CreateHospitalAccessRequest } from "./domain/use-cases/hospital/create_access_request";
+import { CreateHospitalAccessRequest } from "./domain/use-cases/hospital/create-access-request";
 import { HospitalRequestRepositoryImpl } from "./domain/repositories/hospital-request-repository";
 import { MongoDBHospitalRequestDataSource } from "./data/data-sources/mongodb/mongodb-hopital-request-data-source";
-import { GetAllRequest } from "./domain/use-cases/hospital/get_all_requests";
+import { GetAllRequest } from "./domain/use-cases/hospital/get-all-requests";
+import { HospitalAccessResponse } from "./domain/use-cases/hospital/response-access-request";
 
 async function getMongoDB(): Promise<MongoDBWrapper> {
   const client: MongoClient = new MongoClient(
@@ -42,27 +43,24 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
     mongoClientDB
   );
   const bcryptService = new BcryptService();
-  var jwtService = new JwtService();
+  const jwtService = new JwtService();
   const version = "api/v1";
 
+  const userRepo = new UserRepositoryImpl(userDataSource);
   const userMiddleWare = UserRouter(
-    new CreateUser(new UserRepositoryImpl(userDataSource), bcryptService),
-    new GetAllUsers(new UserRepositoryImpl(userDataSource))
+    new CreateUser(userRepo, bcryptService),
+    new GetAllUsers(userRepo)
   );
 
   const authMiddleWare = AuthRouter(
-    new LoginAuth(
-      new UserRepositoryImpl(userDataSource),
-      bcryptService,
-      jwtService
-    )
+    new LoginAuth(userRepo, bcryptService, jwtService)
   );
 
+  const hospitalRepo = new HospitalRequestRepositoryImpl(hospitalDataSource);
   const hospitalMiddleWare = HospitalRequestRouter(
-    new CreateHospitalAccessRequest(
-      new HospitalRequestRepositoryImpl(hospitalDataSource)
-    ),
-    new GetAllRequest(new HospitalRequestRepositoryImpl(hospitalDataSource))
+    new CreateHospitalAccessRequest(hospitalRepo),
+    new GetAllRequest(hospitalRepo),
+    new HospitalAccessResponse(hospitalRepo)
   );
 
   server.use(`/${version}/users`, userMiddleWare);

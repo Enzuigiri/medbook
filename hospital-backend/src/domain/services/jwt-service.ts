@@ -28,7 +28,7 @@ export class JwtService implements IJwtService {
 //   }
 
   createToken(
-    payload: IJwtServicePayload,
+    payload: object,
     secrets: string,
     expireIn: string
   ): string {

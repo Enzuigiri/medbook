@@ -42,7 +42,7 @@ export default function UserRouter(
 
         if (exception.isEmpty()) {
           await createUserUseCase.execute(req.body);
-          return res.status(201).send({ message: "Created" });
+          return res.status(201).send({ message: "User created" });
         }
 
         ErrorUtils.error.badRequestException({
