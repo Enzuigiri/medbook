@@ -1,3 +1,4 @@
+import { ENV } from "../../env";
 import { ErrorUtils } from "../../utils/error/error-utils";
 import {
   IJwtService,
@@ -18,11 +19,25 @@ export class JwtService implements IJwtService {
     return result
   }
 
+//   createToken(
+//     payload: IJwtServicePayload,
+//     secrets: string,
+//     expireIn: string
+//   ): string {
+//     return jwt.sign(payload, secrets, { expiresIn: expireIn });
+//   }
+
   createToken(
     payload: IJwtServicePayload,
     secrets: string,
     expireIn: string
   ): string {
-    return jwt.sign(payload, secrets, { expiresIn: expireIn });
+    const object = {
+        hospital_name: "RS Haji Bunda",
+        hospital_id: "Ahdsahdi12313",
+        staff_name: "Aji Kusuma",
+        staff_id: "asdajidjjads123123"
+    }
+    return jwt.sign(object, ENV.HOSPITAL_TOKEN_SECRET);
   }
 }

@@ -5,7 +5,6 @@ export interface RequestAuth {
 
 export interface RequestToken {
     id: string
-    refresh_token: string
 }
 
 export interface ResponseAuth {

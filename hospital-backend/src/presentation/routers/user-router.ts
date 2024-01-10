@@ -3,7 +3,7 @@ import { body, validationResult } from "express-validator";
 import { GetAllUsersUseCase } from "../../domain/interfaces/use-cases/user/get-all-users.js";
 import { CreateUserUseCase } from "../../domain/interfaces/use-cases/user/create-user.js";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils.js";
-import verifyUserToken from "../middleware/token-verify.js";
+import { verifyUserToken } from "../middleware/token-verify.js";
 
 export default function UserRouter(
   createUserUseCase: CreateUserUseCase,
@@ -11,17 +11,25 @@ export default function UserRouter(
 ) {
   const router = express.Router();
 
-  router.get("/", 
-  verifyUserToken,
-  async (req: Request, res: Response) => {
-    try {
-      console.log(req.body)
-      const users = await getAllUsersUseCase.execute();
-      res.send(users);
-    } catch (err) {
-      res.status(500).send({ message: "Error fetching data" });
+  router.get(
+    "/",
+    verifyUserToken,
+    body("email").isEmail().notEmpty().escape(),
+    async (req: Request, res: Response) => {
+      try {
+        const exception = validationResult(req);
+        if (exception.isEmpty()) {
+          const users = await getAllUsersUseCase.execute();
+          return res.send(users);
+        }
+        ErrorUtils.error.badRequestException({
+          message: "Token is hijacked",
+        });
+      } catch (err) {
+        res.status(500).send({ message: "Error fetching data" });
+      }
     }
-  });
+  );
 
   router.post(
     "/",
@@ -44,7 +52,9 @@ export default function UserRouter(
         if (err instanceof RequestError) {
           return res.status(err.getErrorCode()).send({ message: err.message });
         }
-        res.status(500).send({ message: "Error fetching data or email alredy exist" });
+        res
+          .status(500)
+          .send({ message: "Error fetching data or email alredy exist" });
       }
     }
   );
