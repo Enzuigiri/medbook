@@ -19,25 +19,25 @@ export class JwtService implements IJwtService {
     return result
   }
 
-//   createToken(
-//     payload: IJwtServicePayload,
-//     secrets: string,
-//     expireIn: string
-//   ): string {
-//     return jwt.sign(payload, secrets, { expiresIn: expireIn });
-//   }
-
   createToken(
     payload: object,
     secrets: string,
     expireIn: string
   ): string {
-    const object = {
-        hospital_name: "RS Haji Bunda",
-        hospital_id: "Ahdsahdi12313",
-        staff_name: "Aji Kusuma",
-        staff_id: "asdajidjjads123123"
-    }
-    return jwt.sign(object, ENV.HOSPITAL_TOKEN_SECRET);
+    return jwt.sign(payload, secrets);
   }
+
+  // createToken(
+  //   payload: object,
+  //   secrets: string,
+  //   expireIn: string
+  // ): string {
+  //   const object = {
+  //       hospital_name: "RS Siloam",
+  //       hospital_id: "SRSJ712938123",
+  //       staff_name: "Dr. Tirta Tchayono",
+  //       staff_id: "DTT8192388293"
+  //   }
+  //   return jwt.sign(object, ENV.HOSPITAL_TOKEN_SECRET);
+  // }
 }

@@ -1,7 +1,6 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, Router } from "express";
 import {
-  verifyHospitalToken,
-  verifyUserToken,
+  verifyToken,
 } from "../middleware/token-verify";
 import { body, validationResult } from "express-validator";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils";
@@ -16,12 +15,11 @@ export default function HospitalRequestRouter(
   createAccessRequest: CreateHospitalAccessRequestUseCase,
   getAllRequest: GetAllRequestUseCase,
   responseAccessRequest: HospitalAccessResponseUseCase
-) {
+): Router {
   const router = express.Router();
-
   router.post(
     "/",
-    verifyHospitalToken,
+    verifyToken,
     body("user_id").notEmpty().escape(),
     body("request_type").notEmpty().isString().escape(),
     async (req: Request, res: Response) => {
@@ -45,7 +43,7 @@ export default function HospitalRequestRouter(
 
   router.get(
     "/",
-    verifyUserToken,
+    verifyToken,
     body("user_id").notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
@@ -63,9 +61,11 @@ export default function HospitalRequestRouter(
     }
   );
 
+  //TODO: Add http client in use case to hospital server
+
   router.put(
     "/response",
-    verifyUserToken,
+    verifyToken,
     body("user_id").notEmpty().escape(),
     body("req_id").notEmpty().escape(),
     body("request_status").notEmpty().escape(),
@@ -74,14 +74,20 @@ export default function HospitalRequestRouter(
         const exception = validationResult(req);
         if (exception.isEmpty()) {
           const result = await responseAccessRequest.execute(req.body);
+          console.log(`tes ${result}`)
+          // Todo token Logic
           var token = "Failed to create";
           if (result) {
-            token = new JwtService().createToken({
-              user_id: req.body.user_id,
-              req_id: req.body.req_id,
-            }, ENV.WRITE_TOKEN_SECRET, "");
+            token = new JwtService().createToken(
+              {
+                user_id: req.body.user_id,
+                req_id: req.body.req_id,
+              },
+              ENV.WRITE_TOKEN_SECRET,
+              ""
+            );
           }
-          return res.status(result ? 200 : 400).send({ token: token});
+          return res.status(result ? 200 : 400).send({ token: token });
         }
         ErrorUtils.error.badRequestException({
           message: "Some data is missing or wrong value",

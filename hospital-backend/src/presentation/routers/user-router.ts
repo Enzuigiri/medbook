@@ -1,19 +1,19 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, Router } from "express";
 import { body, validationResult } from "express-validator";
 import { GetAllUsersUseCase } from "../../domain/interfaces/use-cases/user/get-all-users.js";
 import { CreateUserUseCase } from "../../domain/interfaces/use-cases/user/create-user.js";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils.js";
-import { verifyUserToken } from "../middleware/token-verify.js";
+import { verifyToken } from "../middleware/token-verify.js";
 
 export default function UserRouter(
   createUserUseCase: CreateUserUseCase,
   getAllUsersUseCase: GetAllUsersUseCase
-) {
+): Router {
   const router = express.Router();
 
   router.get(
     "/",
-    verifyUserToken,
+    verifyToken,
     body("email").isEmail().notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
