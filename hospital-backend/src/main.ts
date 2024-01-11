@@ -16,6 +16,12 @@ import { HospitalRequestRepositoryImpl } from "./domain/repositories/hospital-re
 import { MongoDBHospitalRequestDataSource } from "./data/data-sources/mongodb/mongodb-hopital-request-data-source";
 import { GetAllRequest } from "./domain/use-cases/hospital/get-all-requests";
 import { HospitalAccessResponse } from "./domain/use-cases/hospital/response-access-request";
+import { MongoDBMedicationDataSource } from "./data/data-sources/mongodb/mongodb-medication-data-source";
+import { MedicationRepositoryImpl } from "./domain/repositories/medication-repository";
+import MedicationRouter from "./presentation/routers/medication-router";
+import { CreateMedication } from "./domain/use-cases/medical/create-medication";
+import { EditMedication } from "./domain/use-cases/medical/edit-medication";
+import { GetAllMedication } from "./domain/use-cases/medical/get-all-medications";
 
 async function getMongoDB(): Promise<MongoDBWrapper> {
   const client: MongoClient = new MongoClient(
@@ -42,6 +48,7 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
   const hospitalDataSource = new MongoDBHospitalRequestDataSource(
     mongoClientDB
   );
+  const medicationDataSource = new MongoDBMedicationDataSource(mongoClientDB)
   const bcryptService = new BcryptService();
   const jwtService = new JwtService();
   const version = "api/v1";
@@ -63,8 +70,16 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
     new HospitalAccessResponse(hospitalRepo)
   );
 
+  const medicationRepo = new MedicationRepositoryImpl(medicationDataSource);
+  const medicationMiddleWare = MedicationRouter(
+    new CreateMedication(medicationRepo),
+    new EditMedication(medicationRepo),
+    new GetAllMedication(medicationRepo)
+  )
+
   server.use(`/${version}/users`, userMiddleWare);
   server.use(`/${version}/auth`, authMiddleWare);
-  server.use(`/${version}/hospital`, hospitalMiddleWare);
+  server.use(`/${version}/users/hospital`, hospitalMiddleWare);
+  server.use(`/${version}/users/medication`, medicationMiddleWare);
   server.listen(3000, () => console.log("Running on http://localhost:3000"));
 })();

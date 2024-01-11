@@ -17,7 +17,7 @@ export class CreateUser implements CreateUserUseCase {
     user.created_at = new Date();
     user.last_login = new Date();
     user.hospital_request = [];
-    user.medical_record = { medications: [] };
+    user.medical_record = { medication: [] };
     user.refrest_token = ""
     const result = await this.userRepository.createUser(user);
     return result;
