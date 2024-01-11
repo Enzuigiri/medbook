@@ -16,8 +16,12 @@ export class MedicationRepositoryImpl implements MedicationRepository {
     return result;
   }
 
-  editMedication(user_id: string, medication: Medication): Promise<Boolean> {
-    throw new Error("Method not implemented.");
+  async editMedication(
+    user_id: string,
+    medication: Medication
+  ): Promise<Boolean> {
+    const result = await this.medicationDataSource.edit(user_id, medication);
+    return result;
   }
 
   getMedications(user_id: string): Promise<Medication[]> {

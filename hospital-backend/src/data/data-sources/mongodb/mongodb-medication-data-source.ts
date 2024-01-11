@@ -18,8 +18,19 @@ export class MongoDBMedicationDataSource implements MedicationDataSource {
     return result !== null;
   }
 
-  async update(user_id: string, medication: Medication): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async edit(user_id: string, medication: Medication): Promise<boolean> {
+    const result = await this.mongoDB.updateOne(
+      {
+        email: user_id,
+        "medical_record.medication.id": medication.id,
+        "medical_record.medication.req_id": medication.req_id,
+      },
+      {
+        $set: { "medical_record.medication.$": medication },
+      }
+    );
+    console.log(result)
+    return result !== null && result.matchedCount > 0;
   }
 
   async getAll(user_id: string): Promise<Medication[]> {

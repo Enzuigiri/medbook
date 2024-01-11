@@ -27,6 +27,7 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
         verifyUserToken(req, token, jwt, ENV.TOKEN_SECRET)
       }
     }
+    
     next();
   } catch (err) {
     if (err instanceof RequestError) {
