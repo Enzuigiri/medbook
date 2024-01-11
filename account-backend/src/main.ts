@@ -22,14 +22,15 @@ import MedicationRouter from "./presentation/routers/medication-router";
 import { CreateMedication } from "./domain/use-cases/medical/create-medication";
 import { EditMedication } from "./domain/use-cases/medical/edit-medication";
 import { GetAllMedication } from "./domain/use-cases/medical/get-all-medications";
+import "dotenv/config";
 
 async function getMongoDB(): Promise<MongoDBWrapper> {
   const client: MongoClient = new MongoClient(
-    "mongodb://root:Test12345!@localhost:27017/"
+    `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_SERVER}:${process.env.DB_PORT}/`
   );
   await client.connect();
 
-  const db = client.db("account_db");
+  const db = client.db(process.env.DB_NAME);
 
   const dbWrapper: MongoDBWrapper = {
     find: (query) => db.collection("users").find(query).toArray(),
@@ -48,7 +49,7 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
   const hospitalDataSource = new MongoDBHospitalRequestDataSource(
     mongoClientDB
   );
-  const medicationDataSource = new MongoDBMedicationDataSource(mongoClientDB)
+  const medicationDataSource = new MongoDBMedicationDataSource(mongoClientDB);
   const bcryptService = new BcryptService();
   const jwtService = new JwtService();
   const version = "api/v1";
@@ -75,7 +76,7 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
     new CreateMedication(medicationRepo),
     new EditMedication(medicationRepo),
     new GetAllMedication(medicationRepo)
-  )
+  );
 
   server.use(`/${version}/users`, userMiddleWare);
   server.use(`/${version}/auth`, authMiddleWare);

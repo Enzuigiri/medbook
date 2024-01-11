@@ -1,4 +1,3 @@
-import { ENV } from "../../env";
 import { ErrorUtils } from "../../utils/error/error-utils";
 import {
   IJwtService,
@@ -24,7 +23,7 @@ export class JwtService implements IJwtService {
     secrets: string,
     expireIn: string
   ): string {
-    return jwt.sign(payload, secrets);
+    return jwt.sign(payload, secrets, (expireIn) ? { expiresIn: expireIn } : {});
   }
 
   // createToken(

@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { ENV } from "../../env";
 import { RequestError } from "../../utils/error/error-utils";
 import { JwtService } from "../../domain/services/jwt-service";
 
@@ -13,19 +12,19 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
     const jwt = new JwtService();
     switch (header) {
       case "hospital": {
-        verifyHospitalToken(req, token, jwt, ENV.HOSPITAL_TOKEN_SECRET);
+        verifyHospitalToken(req, token, jwt, process.env.HOSPITAL_TOKEN_SECRET);
         break;
       }
       case "read": {
-        verifyAccessToken(req, res, token, jwt, ENV.READ_TOKEN_SECRET)
+        verifyAccessToken(req, res, token, jwt, process.env.READ_TOKEN_SECRET)
         break;
       }
       case "write": {
-        verifyAccessToken(req, res, token, jwt, ENV.WRITE_TOKEN_SECRET)
+        verifyAccessToken(req, res, token, jwt, process.env.WRITE_TOKEN_SECRET)
         break;
       }
       default: {
-        verifyUserToken(req, res, token, jwt, ENV.TOKEN_SECRET)
+        verifyUserToken(req, res, token, jwt, process.env.TOKEN_SECRET)
       }
     }
     

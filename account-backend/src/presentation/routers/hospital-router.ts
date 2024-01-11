@@ -6,10 +6,8 @@ import { body, validationResult } from "express-validator";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils";
 import { GetAllRequestUseCase } from "../../domain/interfaces/use-cases/hospital/get-all-requests";
 import { CreateHospitalAccessRequestUseCase } from "../../domain/interfaces/use-cases/hospital/create-access-request";
-import { HospitalAccessResponse } from "../../domain/use-cases/hospital/response-access-request";
 import { HospitalAccessResponseUseCase } from "../../domain/interfaces/use-cases/hospital/response-access-request";
 import { JwtService } from "../../domain/services/jwt-service";
-import { ENV } from "../../env";
 
 export default function HospitalRequestRouter(
   createAccessRequest: CreateHospitalAccessRequestUseCase,
@@ -83,7 +81,7 @@ export default function HospitalRequestRouter(
                 user_id: req.body.user_id,
                 req_id: req.body.req_id,
               },
-              ENV.WRITE_TOKEN_SECRET,
+              process.env.WRITE_TOKEN_SECRET,
               ""
             );
           }
