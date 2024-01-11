@@ -26,14 +26,23 @@ export class MongoDBMedicationDataSource implements MedicationDataSource {
         "medical_record.medication.req_id": medication.req_id,
       },
       {
-        $set: { "medical_record.medication.$": medication },
+        $set: {
+          "medical_record.medication.$.name": medication.name,
+          "medical_record.medication.$.frequency": medication.frequency,
+          "medical_record.medication.$.dose": medication.dose,
+        },
       }
     );
-    console.log(result)
+    console.log(result);
     return result !== null && result.matchedCount > 0;
   }
 
   async getAll(user_id: string): Promise<Medication[]> {
-    throw new Error("Method not implemented.");
+    const result = await this.mongoDB.findOne({ email: user_id });
+    return result.medical_record.medication.map((medication) => {
+      id: medication.id;
+      name: medication.name;
+      frequency: medication.frequency;
+    });
   }
 }

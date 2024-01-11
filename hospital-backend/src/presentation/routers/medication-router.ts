@@ -25,7 +25,9 @@ export default function MedicationRouter(
       try {
         const exception = validationResult(req);
         if (exception.isEmpty()) {
-          await createMedication.execute(req.body.user_id, req.body);
+          const user_id = req.body.user_id;
+          delete req.body.user_id;
+          await createMedication.execute(user_id, req.body);
           return res.status(201).send({ message: "Medication created" });
         }
         ErrorUtils.error.badRequestException({
@@ -44,7 +46,6 @@ export default function MedicationRouter(
     "/",
     verifyToken,
     body("user_id").isString().notEmpty().escape(),
-    body("req_id").isString().notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
         const exception = validationResult(req);
@@ -75,21 +76,19 @@ export default function MedicationRouter(
     body("frequency").isString().notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
-        console.log(req.body);
         const exception = validationResult(req);
+
         if (exception.isEmpty()) {
-          const result = await editMedication.execute(
-            req.body.user_id,
-            req.body
-          );
-          return res
-            .status(result ? 200 : 404)
-            .send({
-              message: result
-                ? "Success"
-                : "Failed data not found or not authorized",
-            });
+          const user_id = req.body.user_id;
+          delete req.body.user_id;
+          const result = await editMedication.execute(user_id, req.body);
+          return res.status(result ? 200 : 404).send({
+            message: result
+              ? "Success"
+              : "Failed data not found or not authorized",
+          });
         }
+
         ErrorUtils.error.badRequestException({
           message: "Some data is missing or wrong value",
         });
