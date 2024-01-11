@@ -2,7 +2,7 @@ import { CreateMedicationUseCase } from "../../domain/interfaces/use-cases/medic
 import { EditMedicationUseCase } from "../../domain/interfaces/use-cases/medical/edit-medication";
 import { GetAllMedicationsUseCase } from "../../domain/interfaces/use-cases/medical/get-all-medications";
 import express, { Router, Request, Response } from "express"
-import { verifyToken } from "../middleware/token-verify";
+import { verifyToken } from "../middleware/verify-token";
 import { body, validationResult } from "express-validator";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils";
 

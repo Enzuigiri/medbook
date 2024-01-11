@@ -3,7 +3,7 @@ import { body, validationResult } from "express-validator";
 import { GetAllUsersUseCase } from "../../domain/interfaces/use-cases/user/get-all-users.js";
 import { CreateUserUseCase } from "../../domain/interfaces/use-cases/user/create-user.js";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils.js";
-import { verifyToken } from "../middleware/token-verify.js";
+import { verifyToken } from "../middleware/verify-token.js";
 
 export default function UserRouter(
   createUserUseCase: CreateUserUseCase,
@@ -14,7 +14,7 @@ export default function UserRouter(
   router.get(
     "/",
     verifyToken,
-    body("email").isEmail().notEmpty().escape(),
+    body("user_id").isEmail().notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
         const exception = validationResult(req);

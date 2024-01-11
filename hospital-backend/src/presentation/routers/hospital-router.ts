@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from "express";
 import {
   verifyToken,
-} from "../middleware/token-verify";
+} from "../middleware/verify-token";
 import { body, validationResult } from "express-validator";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils";
 import { GetAllRequestUseCase } from "../../domain/interfaces/use-cases/hospital/get-all-requests";
