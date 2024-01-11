@@ -24,7 +24,8 @@ export class MedicationRepositoryImpl implements MedicationRepository {
     return result;
   }
 
-  getMedications(user_id: string): Promise<Medication[]> {
-    throw new Error("Method not implemented.");
+  async getMedications(user_id: string): Promise<Medication[]> {
+    const result = await this.medicationDataSource.getAll(user_id);
+    return result;
   }
 }

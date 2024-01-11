@@ -39,10 +39,13 @@ export class MongoDBMedicationDataSource implements MedicationDataSource {
 
   async getAll(user_id: string): Promise<Medication[]> {
     const result = await this.mongoDB.findOne({ email: user_id });
-    return result.medical_record.medication.map((medication) => {
-      id: medication.id;
-      name: medication.name;
-      frequency: medication.frequency;
-    });
+    return result.medical_record.medication.map((medication: Medication) => ({
+      id: medication.id,
+      name: medication.name,
+      dose: medication.dose,
+      frequency: medication.frequency,
+      req_id: medication.req_id,
+      created_date: medication.created_date,
+    }));
   }
 }

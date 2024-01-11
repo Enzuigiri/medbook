@@ -3,6 +3,7 @@ import { ENV } from "../../env";
 import { RequestError } from "../../utils/error/error-utils";
 import { JwtService } from "../../domain/services/jwt-service";
 
+// Need to fix req.body
 export function verifyToken(req: Request, res: Response, next: NextFunction) {
   try {
     const authHeader = req.headers["authorization"];
@@ -16,15 +17,15 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
         break;
       }
       case "read": {
-        verifyAccessToken(req, token, jwt, ENV.READ_TOKEN_SECRET)
+        verifyAccessToken(req, res, token, jwt, ENV.READ_TOKEN_SECRET)
         break;
       }
       case "write": {
-        verifyAccessToken(req, token, jwt, ENV.WRITE_TOKEN_SECRET)
+        verifyAccessToken(req, res, token, jwt, ENV.WRITE_TOKEN_SECRET)
         break;
       }
       default: {
-        verifyUserToken(req, token, jwt, ENV.TOKEN_SECRET)
+        verifyUserToken(req, res, token, jwt, ENV.TOKEN_SECRET)
       }
     }
     
@@ -39,12 +40,14 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
 
 function verifyUserToken(
   req: Request,
+  res: Response,
   token: string,
   jwtService: JwtService,
   secret: string
 ) {
   const result = jwtService.checkToken(token, secret);
   req.body.user_id = result.email;
+  res.locals.access = true;
 }
 
 function verifyHospitalToken(
@@ -62,6 +65,7 @@ function verifyHospitalToken(
 
 function verifyAccessToken(
   req: Request,
+  res: Response,
   token: string,
   jwtService: JwtService,
   secret: string
@@ -69,4 +73,5 @@ function verifyAccessToken(
   const result = jwtService.checkToken(token, secret);
   req.body.user_id = result.user_id;
   req.body.req_id = result.req_id;
+  res.locals.access = true;
 }

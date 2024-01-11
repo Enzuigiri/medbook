@@ -42,28 +42,21 @@ export default function MedicationRouter(
     }
   );
 
-  router.get(
-    "/",
-    verifyToken,
-    body("user_id").isString().notEmpty().escape(),
-    async (req: Request, res: Response) => {
-      try {
-        const exception = validationResult(req);
-        if (exception.isEmpty()) {
-          const result = await getAllMedication.execute(req.body.user_id);
-          return res.status(200).send(result);
-        }
-        ErrorUtils.error.badRequestException({
-          message: "Bad Token",
-        });
-      } catch (err) {
-        if (err instanceof RequestError) {
-          return res.status(err.getErrorCode()).send({ message: err.message });
-        }
-        res.status(500).send({ message: "Error fetching data" });
+  router.get("/", verifyToken, async (req: Request, res: Response) => {
+    try {
+      if (res.locals.access) {
+        const result = await getAllMedication.execute(req.body.user_id);
+        return res.status(200).send(result);
       }
+
+      res.status(401).send({ message: "Bad token" });
+    } catch (err) {
+      if (err instanceof RequestError) {
+        return res.status(err.getErrorCode()).send({ message: err.message });
+      }
+      res.status(500).send({ message: "Error fetching data" });
     }
-  );
+  });
 
   router.put(
     "/",
