@@ -19,10 +19,15 @@ export class MongoDBMedicationAccessDataSource
   }
 
   async update(user_id: string, access: MedicationAccess): Promise<boolean> {
-    throw new Error("Method not implemented.");
+    const result = await this.database.updateOne(
+      { _id: user_id, "medication_access.id": access.id },
+      { $set: { "medication.$.request_access": access.request_status } }
+    );
+    return result;
   }
 
   async getAll(user_id: string): Promise<MedicationAccess[]> {
-    throw new Error("Method not implemented.");
+    const result = await this.database.findOne({_id: user_id})
+    return result
   }
 }
