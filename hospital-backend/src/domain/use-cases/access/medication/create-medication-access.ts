@@ -1,3 +1,4 @@
+import { Medication } from "../../../entities/medication";
 import { MedicationAccess, MedicationAccessRequest } from "../../../entities/medication_access";
 import { MedicationAccessRepository } from "../../../interfaces/repositories/medication-access-repository";
 import { IJwtService } from "../../../interfaces/services/jwt-service";
@@ -11,11 +12,11 @@ export class CreateMedicationAccess implements CreateMedicationAccessUseCase {
     this.jwtService = jwtService
   }
 
-  async execute(user_id: string, access_request: MedicationAccessRequest, token: string): Promise<boolean> {
+  async execute(user_id: string, access_request: MedicationAccess, token: string): Promise<boolean> {
 
     const result = await this.medicationAccessRepository.create(
       user_id,
-      access,
+      access_request,
       token
     );
     return result;

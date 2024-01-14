@@ -1,6 +1,6 @@
 import { ErrorUtils } from "../../../utils/error/error-utils";
 import { RequestAuth, ResponseAuth } from "../../entities/auth";
-import { UserRepository } from "../../interfaces/repositories/user-repository";
+import { StaffRepository } from "../../interfaces/repositories/staff-repository";
 import { IBcryptService } from "../../interfaces/services/bcrypt-service";
 import {
   IJwtService,
@@ -9,22 +9,22 @@ import {
 import { LoginUseCase } from "../../interfaces/use-cases/auth/login-auth";
 
 export class LoginAuth implements LoginUseCase {
-  private readonly userRepository: UserRepository;
+  private readonly staffRepository: StaffRepository;
   private readonly bcryptService: IBcryptService;
   private readonly jwtService: IJwtService;
 
   constructor(
-    userRepository: UserRepository,
+    staffRepository: StaffRepository,
     bcryptService: IBcryptService,
     jwtService: IJwtService
   ) {
-    this.userRepository = userRepository;
+    this.staffRepository = staffRepository;
     this.bcryptService = bcryptService;
     this.jwtService = jwtService;
   }
 
   async execute(data: RequestAuth): Promise<ResponseAuth> {
-    const result = await this.userRepository.getUserByEmail(data.email);
+    const result = await this.staffRepository.getStaffByEmail(data.email);
 
     if (result == null) {
       ErrorUtils.error.badRequestException({
@@ -33,8 +33,9 @@ export class LoginAuth implements LoginUseCase {
     }
 
     if (this.bcryptService.compare(data.password, result.password)) {
-      let tokenPayload: IJwtServicePayload = { email: result.email };
-      
+      console.log(result)
+      let tokenPayload = { user_id: result._id.toString() };
+      console.log(tokenPayload)
       let refresh_token = this.jwtService.createToken(
         tokenPayload,
         process.env.REFRESH_TOKEN_SECRET,
@@ -48,7 +49,7 @@ export class LoginAuth implements LoginUseCase {
 
       result.last_login = new Date();
       result.refrest_token = refresh_token;
-      await this.userRepository.update(result);
+      await this.staffRepository.updateStaff(result);
 
       return {
         refresh_token: refresh_token,

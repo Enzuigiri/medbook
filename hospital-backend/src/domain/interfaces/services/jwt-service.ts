@@ -5,7 +5,7 @@ export interface IJwtServicePayload {
 export interface IJwtService {
   checkToken(token: string, secrets: string): Promise<any>;
   createToken(
-    payload: IJwtServicePayload,
+    payload: object,
     secrets: string,
     expireIn: string
   ): string;

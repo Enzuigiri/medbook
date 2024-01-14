@@ -1,15 +1,18 @@
+import server from "./server";
 import { MongoClient } from "mongodb";
 import { MongoDBWrapper } from "./data/interfaces/mongo-db-wrapper";
-import UserRouter from "./presentation/routers/user-router";
-import { GetAllUsers } from "./domain/use-cases/user/get-all-users";
-import { UserRepositoryImpl } from "./domain/repositories/user-repository";
-import { MongoDBUserDataSource } from "./data/data-sources/mongodb/mongodb-user-data-source";
-import { CreateUser } from "./domain/use-cases/user/create-user";
-import server from "./server";
+
+import StaffRouter from "./presentation/routers/staff-router";
+import { GetAllStaffs } from "./domain/use-cases/staff/get-all-staffs";
+import { StaffRepositoryImpl } from "./domain/repositories/staff-repository";
+import { MongoDBStaffDataSource } from "./data/data-sources/mongodb/mongodb-staff-data-source";
+import { SignUpStaff } from "./domain/use-cases/staff/sign-up-staff";
+
 import AuthRouter from "./presentation/routers/auth-router";
 import { LoginAuth } from "./domain/use-cases/auth/login-auth";
 import { BcryptService } from "./domain/services/bcrypt-service";
 import { JwtService } from "./domain/services/jwt-service";
+
 import HospitalRequestRouter from "./presentation/routers/hospital-router";
 import { CreateHospitalAccessRequest } from "./domain/use-cases/hospital/create-access-request";
 import { HospitalRequestRepositoryImpl } from "./domain/repositories/hospital-request-repository";
@@ -18,6 +21,7 @@ import { GetAllRequest } from "./domain/use-cases/hospital/get-all-requests";
 import { HospitalAccessResponse } from "./domain/use-cases/hospital/response-access-request";
 import { MongoDBMedicationDataSource } from "./data/data-sources/mongodb/mongodb-medication-data-source";
 import { MedicationRepositoryImpl } from "./domain/repositories/medication-repository";
+
 import MedicationRouter from "./presentation/routers/medication-router";
 import { CreateMedication } from "./domain/use-cases/medical/create-medication";
 import { EditMedication } from "./domain/use-cases/medical/edit-medication";
@@ -31,13 +35,14 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
   await client.connect();
 
   const db = client.db(process.env.DB_NAME);
+  const collectionName = "staffs"
 
   const dbWrapper: MongoDBWrapper = {
-    find: (query) => db.collection("users").find(query).toArray(),
-    insertOne: (doc: any) => db.collection("users").insertOne(doc),
-    findOne: (query) => db.collection("users").findOne(query),
+    find: (query) => db.collection(collectionName).find(query).toArray(),
+    insertOne: (doc: any) => db.collection(collectionName).insertOne(doc),
+    findOne: (query) => db.collection(collectionName).findOne(query),
     updateOne: (query, update) =>
-      db.collection("users").updateOne(query, update),
+      db.collection(collectionName).updateOne(query, update),
   };
 
   return dbWrapper;
@@ -45,7 +50,7 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
 
 (async () => {
   const mongoClientDB = await getMongoDB();
-  const userDataSource = new MongoDBUserDataSource(mongoClientDB);
+  const userDataSource = new MongoDBStaffDataSource(mongoClientDB);
   const hospitalDataSource = new MongoDBHospitalRequestDataSource(
     mongoClientDB
   );
@@ -54,10 +59,10 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
   const jwtService = new JwtService();
   const version = "api/v1";
 
-  const userRepo = new UserRepositoryImpl(userDataSource);
-  const userMiddleWare = UserRouter(
-    new CreateUser(userRepo, bcryptService),
-    new GetAllUsers(userRepo)
+  const userRepo = new StaffRepositoryImpl(userDataSource);
+  const userMiddleWare = StaffRouter(
+    new SignUpStaff(userRepo, bcryptService),
+    new GetAllStaffs(userRepo)
   );
 
   const authMiddleWare = AuthRouter(
@@ -78,9 +83,9 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
     new GetAllMedication(medicationRepo)
   );
 
-  server.use(`/${version}/users`, userMiddleWare);
+  server.use(`/${version}/staffs`, userMiddleWare);
   server.use(`/${version}/auth`, authMiddleWare);
   server.use(`/${version}/users/hospital`, hospitalMiddleWare);
   server.use(`/${version}/users/medication`, medicationMiddleWare);
-  server.listen(4000, () => console.log("Running on http://localhost:3000"));
+  server.listen(process.env.SERVER_PORT, () => console.log(`Running on http://localhost:${process.env.SERVER_PORT}`));
 })();

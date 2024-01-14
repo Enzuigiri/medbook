@@ -1,7 +1,6 @@
 import { ErrorUtils } from "../../utils/error/error-utils";
 import {
   IJwtService,
-  IJwtServicePayload,
 } from "../interfaces/services/jwt-service";
 import jwt from "jsonwebtoken";
 

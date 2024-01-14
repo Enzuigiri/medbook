@@ -1,13 +1,13 @@
 import express, { Request, Response, Router } from "express";
 import { body, validationResult } from "express-validator";
-import { GetAllUsersUseCase } from "../../domain/interfaces/use-cases/user/get-all-users.js";
-import { CreateUserUseCase } from "../../domain/interfaces/use-cases/user/create-user.js";
+import { GetAllStafsUsecase } from "../../domain/interfaces/use-cases/staff/get-all-staffs.js";
+import { SignUpStaffUseCase } from "../../domain/interfaces/use-cases/staff/sign-up-staff.js";
 import { ErrorUtils, RequestError } from "../../utils/error/error-utils.js";
 import { verifyToken } from "../middleware/verify-token.js";
 
-export default function UserRouter(
-  createUserUseCase: CreateUserUseCase,
-  getAllUsersUseCase: GetAllUsersUseCase
+export default function StaffRouter(
+  signUpStaffUseCase: SignUpStaffUseCase,
+  getAllStaffsUseCase: GetAllStafsUsecase
 ): Router {
   const router = express.Router();
 
@@ -15,12 +15,12 @@ export default function UserRouter(
   router.get(
     "/",
     verifyToken,
-    body("user_id").isEmail().notEmpty().escape(),
+    body("user_id").isString().notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
         const exception = validationResult(req);
         if (exception.isEmpty()) {
-          const users = await getAllUsersUseCase.execute();
+          const users = await getAllStaffsUseCase.execute();
           return res.send(users);
         }
         ErrorUtils.error.badRequestException({
@@ -42,8 +42,8 @@ export default function UserRouter(
         const exception = validationResult(req);
 
         if (exception.isEmpty()) {
-          await createUserUseCase.execute(req.body);
-          return res.status(201).send({ message: "User created" });
+          await signUpStaffUseCase.execute(req.body);
+          return res.status(201).send({ message: "Staff created" });
         }
 
         ErrorUtils.error.badRequestException({

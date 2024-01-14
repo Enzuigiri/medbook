@@ -27,7 +27,6 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
         verifyUserToken(req, res, token, jwt, process.env.TOKEN_SECRET)
       }
     }
-    
     next();
   } catch (err) {
     if (err instanceof RequestError) {
@@ -45,7 +44,7 @@ function verifyUserToken(
   secret: string
 ) {
   const result = jwtService.checkToken(token, secret);
-  req.body.user_id = result.email;
+  req.body.user_id = result.user_id;
   res.locals.access = true;
 }
 
