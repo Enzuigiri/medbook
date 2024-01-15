@@ -1,5 +1,3 @@
-import { HospitalRequest } from "./hospital-request.js";
-import { MedicalRecord } from "./medical-record.js";
 import { MedicationAccess } from "./medication_access.js";
 
 export interface User {
@@ -8,3 +6,5 @@ export interface User {
   email: string;
   medication_access?: MedicationAccess[];
 }
+
+export type GetAllUserResponse = [User]

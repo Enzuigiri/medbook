@@ -14,8 +14,8 @@ export class MongoDBUserDataSource implements UserDataSource {
     return result !== null;
   }
 
-  async getUserByEmail(email: string): Promise<User> {
-    const result = await this.database.findOne({ email: email });
+  async getUserByID(user_id: string): Promise<User> {
+    const result = await this.database.findOne({ $or: [ {email: user_id}, {_id: user_id}] });
     return result;
   }
 

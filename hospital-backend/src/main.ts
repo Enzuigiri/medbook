@@ -27,6 +27,11 @@ import { CreateMedication } from "./domain/use-cases/medical/create-medication";
 import { EditMedication } from "./domain/use-cases/medical/edit-medication";
 import { GetAllMedication } from "./domain/use-cases/medical/get-all-medications";
 import "dotenv/config";
+import axios, { Axios, AxiosStatic } from "axios";
+import { AxiosUserDataSource } from "./data/data-sources/httpclient/axios-user-data-source";
+import { UserRepositoryImpl } from "./domain/repositories/user-repository";
+import UserRouter from "./presentation/routers/user-router";
+import { GetAllUser } from "./domain/use-cases/user/get-all-user";
 
 async function getMongoDB(): Promise<MongoDBWrapper> {
   const client: MongoClient = new MongoClient(
@@ -50,6 +55,7 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
 
 (async () => {
   const mongoClientDB = await getMongoDB();
+  const axiosUser = new AxiosUserDataSource(axios, "http://localhost:3000/api/v1")
   const userDataSource = new MongoDBStaffDataSource(mongoClientDB);
   const hospitalDataSource = new MongoDBHospitalRequestDataSource(
     mongoClientDB
@@ -59,14 +65,14 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
   const jwtService = new JwtService();
   const version = "api/v1";
 
-  const userRepo = new StaffRepositoryImpl(userDataSource);
-  const userMiddleWare = StaffRouter(
-    new SignUpStaff(userRepo, bcryptService),
-    new GetAllStaffs(userRepo)
+  const staffRepo = new StaffRepositoryImpl(userDataSource);
+  const staffMiddleWare = StaffRouter(
+    new SignUpStaff(staffRepo, bcryptService),
+    new GetAllStaffs(staffRepo)
   );
 
   const authMiddleWare = AuthRouter(
-    new LoginAuth(userRepo, bcryptService, jwtService)
+    new LoginAuth(staffRepo, bcryptService, jwtService)
   );
 
   const hospitalRepo = new HospitalRequestRepositoryImpl(hospitalDataSource);
@@ -76,6 +82,11 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
     new HospitalAccessResponse(hospitalRepo)
   );
 
+  const userRepo = new UserRepositoryImpl(axiosUser)
+  const userMiddleware = UserRouter(
+    new GetAllUser(userRepo, staffRepo, jwtService)
+  )
+
   const medicationRepo = new MedicationRepositoryImpl(medicationDataSource);
   const medicationMiddleWare = MedicationRouter(
     new CreateMedication(medicationRepo),
@@ -83,9 +94,10 @@ async function getMongoDB(): Promise<MongoDBWrapper> {
     new GetAllMedication(medicationRepo)
   );
 
-  server.use(`/${version}/staffs`, userMiddleWare);
+  server.use(`/${version}/staffs`, staffMiddleWare);
   server.use(`/${version}/auth`, authMiddleWare);
   server.use(`/${version}/users/hospital`, hospitalMiddleWare);
   server.use(`/${version}/users/medication`, medicationMiddleWare);
+  server.use(`/${version}/users`, userMiddleware);
   server.listen(process.env.SERVER_PORT, () => console.log(`Running on http://localhost:${process.env.SERVER_PORT}`));
 })();

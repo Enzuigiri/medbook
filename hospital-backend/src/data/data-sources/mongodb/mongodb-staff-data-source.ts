@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { Staff } from "../../../domain/entities/staff";
 import { MongoDBWrapper } from "../../interfaces/mongo-db-wrapper";
 import { StaffDataSource } from "../../interfaces/staff-data-source";
@@ -23,8 +24,9 @@ export class MongoDBStaffDataSource implements StaffDataSource {
     }));
   }
 
-  async getStaffByEmail(email: string): Promise<Staff> {
-    const result = await this.database.findOne({ email: email });
+  async getStaffByID(staff_id: string): Promise<Staff> {
+    var object_id = ObjectId.createFromHexString(staff_id)
+    const result = await this.database.findOne({ $or: [{ _id: object_id }, { email: staff_id}]});
     return result;
   }
 

@@ -24,7 +24,7 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
         break;
       }
       default: {
-        verifyUserToken(req, res, token, jwt, process.env.TOKEN_SECRET)
+        verifyStaffToken(req, res, token, jwt, process.env.TOKEN_SECRET)
       }
     }
     next();
@@ -36,7 +36,7 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-function verifyUserToken(
+function verifyStaffToken(
   req: Request,
   res: Response,
   token: string,
@@ -44,7 +44,7 @@ function verifyUserToken(
   secret: string
 ) {
   const result = jwtService.checkToken(token, secret);
-  req.body.user_id = result.user_id;
+  req.body.staff_id = result.staff_id;
   res.locals.access = true;
 }
 
@@ -69,7 +69,7 @@ function verifyAccessToken(
   secret: string
 ) {
   const result = jwtService.checkToken(token, secret);
-  req.body.user_id = result.user_id;
+  req.body.staff_id = result.staff_id;
   req.body.req_id = result.req_id;
   res.locals.access = true;
 }

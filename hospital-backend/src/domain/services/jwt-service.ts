@@ -1,7 +1,5 @@
 import { ErrorUtils } from "../../utils/error/error-utils";
-import {
-  IJwtService,
-} from "../interfaces/services/jwt-service";
+import { IJwtService } from "../interfaces/services/jwt-service";
 import jwt from "jsonwebtoken";
 
 export class JwtService implements IJwtService {
@@ -14,15 +12,16 @@ export class JwtService implements IJwtService {
       }
       return user;
     });
-    return result
+    return result;
   }
 
-  createToken(
-    payload: object,
-    secrets: string,
-    expireIn: string
-  ): string {
-    return jwt.sign(payload, secrets, (expireIn) ? { expiresIn: expireIn } : {});
+  createToken(payload: object, secrets: string, expireIn?: string): string {
+    const token = jwt.sign(
+      payload,
+      secrets,
+      expireIn ? { expiresIn: expireIn } : {}
+    );
+    return token;
   }
 
   // createToken(

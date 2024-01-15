@@ -13,8 +13,8 @@ export class StaffRepositoryImpl implements StaffRepository {
     return result;
   }
 
-  async getStaffByEmail(email: string): Promise<Staff> {
-    const result = await this.userDataSource.getStaffByEmail(email);
+  async getStaffByID(user_id: string): Promise<Staff> {
+    const result = await this.userDataSource.getStaffByID(user_id);
     return result;
   }
 

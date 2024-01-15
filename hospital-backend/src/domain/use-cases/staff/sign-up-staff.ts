@@ -16,7 +16,8 @@ export class SignUpStaff implements SignUpStaffUseCase {
     staff.password = await this.bcryptService.hash(staff.password);
     staff.created_at = new Date();
     staff.last_login = new Date();
-    staff.refrest_token = ""
+    staff.refresh_token = ""
+    
     const result = await this.userRepository.createStaff(staff);
     return result;
   }

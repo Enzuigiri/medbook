@@ -24,7 +24,7 @@ export class LoginAuth implements LoginUseCase {
   }
 
   async execute(data: RequestAuth): Promise<ResponseAuth> {
-    const result = await this.staffRepository.getStaffByEmail(data.email);
+    const result = await this.staffRepository.getStaffByID(data.email);
 
     if (result == null) {
       ErrorUtils.error.badRequestException({
@@ -33,9 +33,9 @@ export class LoginAuth implements LoginUseCase {
     }
 
     if (this.bcryptService.compare(data.password, result.password)) {
-      console.log(result)
-      let tokenPayload = { user_id: result._id.toString() };
-      console.log(tokenPayload)
+      
+      let tokenPayload = { staff_id: result._id.toString() };
+
       let refresh_token = this.jwtService.createToken(
         tokenPayload,
         process.env.REFRESH_TOKEN_SECRET,
@@ -48,7 +48,7 @@ export class LoginAuth implements LoginUseCase {
       );
 
       result.last_login = new Date();
-      result.refrest_token = refresh_token;
+      result.refresh_token = refresh_token;
       await this.staffRepository.updateStaff(result);
 
       return {

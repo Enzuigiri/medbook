@@ -15,7 +15,7 @@ export default function MedicationAccessRouter(
   router.post(
     "/",
     verifyToken,
-    body("user_id").isString().notEmpty().escape(),
+    body("staff_id").isString().notEmpty().escape(),
     body("request_type").isString().notEmpty().escape(),
     body("hospital"),
     async (req: Request, res: Response) => {

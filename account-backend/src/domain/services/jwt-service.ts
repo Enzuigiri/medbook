@@ -10,7 +10,7 @@ export class JwtService implements IJwtService {
     let result = jwt.verify(token, secrets, (err: any, user: any) => {
       if (err) {
         ErrorUtils.error.unauthorizedException({
-          message: "Token is expired or didn't set or wrong",
+          message: err,
         });
       }
       return user;

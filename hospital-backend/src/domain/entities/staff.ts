@@ -7,5 +7,6 @@ export interface Staff {
     password?: string;
     created_at?: Date;
     last_login?: Date;
-    refrest_token?: string;
+    refresh_token?: string;
+    
   }

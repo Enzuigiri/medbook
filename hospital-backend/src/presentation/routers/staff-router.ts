@@ -15,13 +15,13 @@ export default function StaffRouter(
   router.get(
     "/",
     verifyToken,
-    body("user_id").isString().notEmpty().escape(),
+    body("staff_id").isString().notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
         const exception = validationResult(req);
         if (exception.isEmpty()) {
-          const users = await getAllStaffsUseCase.execute();
-          return res.send(users);
+          const staffs = await getAllStaffsUseCase.execute();
+          return res.send(staffs);
         }
         ErrorUtils.error.badRequestException({
           message: "Token is hijacked",
