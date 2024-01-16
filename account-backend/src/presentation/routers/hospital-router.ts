@@ -46,6 +46,7 @@ export default function HospitalRequestRouter(
     async (req: Request, res: Response) => {
       try {
         const exception = validationResult(req);
+        
         if (exception.isEmpty()) {
           const request = await getAllRequest.execute(req.body.user_id);
           return res.send(request);

@@ -9,6 +9,7 @@ export class GetAllRequest implements GetAllRequestUseCase {
   }
 
   async execute(user_id: string): Promise<HospitalRequest[]> {
+   
     const result = await this.hospitalRequestRepository.getRequests(user_id);
     return result;
   }

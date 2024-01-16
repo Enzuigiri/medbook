@@ -23,16 +23,21 @@ export class GetAllUser implements GetAllUserUseCase {
 
   async execute(staff_id: string): Promise<User[]> {
     const staffData = await this.stafRepository.getStaffByID(staff_id);
-   
+
     const tokenPayload: IJwtStaffRequestPayload = {
       hospital_name: process.env.HOSPITAL1_NAME,
       hospital_id: process.env.HOSPITAL1_ID,
       staff_id: staffData._id.toString(),
       staff_name: staffData.name,
     };
-    const token = this.jwtService.createToken(tokenPayload, process.env.HOSPITAL1_TOKEN_SECRET, "")
+
+    const token = this.jwtService.createToken(
+      tokenPayload,
+      process.env.HOSPITAL1_TOKEN_SECRET,
+      ""
+    );
     const result = await this.userRepository.getAllUser(token);
-    
+
     return result;
   }
 }
