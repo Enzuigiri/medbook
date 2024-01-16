@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import {
   HospitalRequest,
   HospitalRequestResponse,
@@ -18,8 +19,9 @@ export class MongoDBHospitalRequestDataSource
     hospital_request: HospitalRequest,
     user_id: string
   ): Promise<boolean> {
+    var objectId = ObjectId.createFromHexString(user_id);
     const result = await this.database.updateOne(
-      { email: user_id },
+      { _id: objectId },
       { $push: { hospital_request: hospital_request } }
     );
     if (result === null) {
@@ -31,7 +33,8 @@ export class MongoDBHospitalRequestDataSource
   }
 
   async getRequests(user_id: string): Promise<HospitalRequest[]> {
-    const result = await this.database.findOne({ email: user_id });
+    var objectId = ObjectId.createFromHexString(user_id);
+    const result = await this.database.findOne({ _id: objectId });
     return result.hospital_request.map((item: HospitalRequest) => ({
       id: item.id,
       hospital_name: item.hospital_name,
@@ -47,9 +50,10 @@ export class MongoDBHospitalRequestDataSource
   async updateResponseStatus(
     hospital_response: HospitalRequestResponse
   ): Promise<boolean> {
+    var objectId = ObjectId.createFromHexString(hospital_response.user_id);
     const result = await this.database.updateOne(
       {
-        email: hospital_response.user_id,
+        _id: objectId ,
         "hospital_request.id": hospital_response.req_id,
       },
       {
@@ -58,8 +62,8 @@ export class MongoDBHospitalRequestDataSource
         },
       }
     );
-    console.log(hospital_response)
-    console.log(result)
+    console.log(hospital_response);
+    console.log(result);
     return result !== null;
   }
 }

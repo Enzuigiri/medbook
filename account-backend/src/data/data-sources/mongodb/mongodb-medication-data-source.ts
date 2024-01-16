@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { Medication } from "../../../domain/entities/medication";
 import { MedicationDataSource } from "../../interfaces/medication-data-source";
 import { MongoDBWrapper } from "../../interfaces/mongo-db-wrapper";
@@ -9,8 +10,9 @@ export class MongoDBMedicationDataSource implements MedicationDataSource {
   }
 
   async create(user_id: string, medication: Medication): Promise<boolean> {
+    var objectId = ObjectId.createFromHexString(user_id);
     const result = await this.mongoDB.updateOne(
-      { email: user_id },
+      { _id: objectId },
       {
         $push: { "medical_record.medication": medication },
       }
@@ -19,9 +21,10 @@ export class MongoDBMedicationDataSource implements MedicationDataSource {
   }
 
   async edit(user_id: string, medication: Medication): Promise<boolean> {
+    var objectId = ObjectId.createFromHexString(user_id);
     const result = await this.mongoDB.updateOne(
       {
-        email: user_id,
+        _id: objectId,
         "medical_record.medication.id": medication.id,
         "medical_record.medication.req_id": medication.req_id,
       },
@@ -38,7 +41,8 @@ export class MongoDBMedicationDataSource implements MedicationDataSource {
   }
 
   async getAll(user_id: string): Promise<Medication[]> {
-    const result = await this.mongoDB.findOne({ email: user_id });
+    var objectId = ObjectId.createFromHexString(user_id);
+    const result = await this.mongoDB.findOne({ _id: objectId });
     return result.medical_record.medication.map((medication: Medication) => ({
       id: medication.id,
       name: medication.name,

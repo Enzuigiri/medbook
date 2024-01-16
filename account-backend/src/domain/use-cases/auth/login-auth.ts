@@ -31,10 +31,11 @@ export class LoginAuth implements LoginUseCase {
         message: "Wrong Email or Password",
       });
     }
-
+    
     if (this.bcryptService.compare(data.password, result.password)) {
-      let tokenPayload: IJwtServicePayload = { email: result.email };
       
+      let tokenPayload: IJwtServicePayload = { user_id: result._id.toHexString() };
+
       let refresh_token = this.jwtService.createToken(
         tokenPayload,
         process.env.REFRESH_TOKEN_SECRET,

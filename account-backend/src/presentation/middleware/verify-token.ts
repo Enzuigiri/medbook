@@ -45,7 +45,7 @@ function verifyUserToken(
   secret: string
 ) {
   const result = jwtService.checkToken(token, secret);
-  req.body.user_id = result.email;
+  req.body.user_id = result.user_id;
   res.locals.access = true;
 }
 

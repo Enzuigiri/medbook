@@ -8,6 +8,11 @@ export class UserRepositoryImpl implements UserRepository {
     this.userDataSource = userDataSouce;
   }
 
+  async getUserByID(user_id: string): Promise<User> {
+    const result = await this.userDataSource.getUserByID(user_id);
+    return result;
+  }
+
   async update(user: User): Promise<boolean> {
     const result = await this.userDataSource.update(user);
     return result;

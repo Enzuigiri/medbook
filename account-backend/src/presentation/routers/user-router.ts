@@ -14,7 +14,6 @@ export default function UserRouter(
   router.get(
     "/",
     verifyToken,
-    body("user_id").isEmail().notEmpty().escape(),
     async (req: Request, res: Response) => {
       try {
         const exception = validationResult(req);
